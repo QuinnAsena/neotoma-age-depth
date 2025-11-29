@@ -1,4 +1,5 @@
 # History files
+/.quarto/
 .Rhistory
 .Rapp.history
 

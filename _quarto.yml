@@ -10,6 +10,7 @@ format:
     code-fold: false
     toc: true
     link-external-newwindow: true
+    
 bibliography: refs.bib
 from: markdown+emoji
 
