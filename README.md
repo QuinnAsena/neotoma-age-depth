@@ -1,17 +1,19 @@
-# neotoma-age-depth
-Neotoma age-depth modelling workshop
+# Hands-on workshop for age-depth modelling using Bchron
 
+Hello and welcome to age-depth modelling using Bchron. There are a few necessary installation instructions to comlpete ahead of time to ensure the workshop runs smoothly!
 
 Install:
 
-- Quarto CLI
+- [Quarto CLI](https://quarto.org/docs/get-started/)
 
 Update:
 
 - R
 - RStudio (or your prefered IDE)
 
-Run:
+Install the required packages:
+
+- Open R (after updating it) and run these lines in the console
 
 ```
 if (!require("pacman")) install.packages("pacman", repos="http://cran.r-project.org")

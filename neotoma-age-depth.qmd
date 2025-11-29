@@ -27,7 +27,7 @@ pacman::p_load(neotoma2, Bchron, splines) # splines comes with BASE-R
 
 A complication in radiocarbon dating is that the initial calculation of a radiocarbon age assumes, by convention, that the amount of radiocarbon in the atmosphere is constant over time. See @ramsey2008 for a good overview of ^14^C dating. This assumption is untrue, so all radiocarbon age estimates must be post-hoc calibrated using a calibration curve that is based on compiling radiocarbon dates of materials that have precise independent age estimates (e.g. tree rings, corals). Yet another complication in radiocarbon dating is that different calibration curves need to be used for the Northern vs. Southern Hemisphere and for the atmosphere vs. oceans, due to different residence times of ^14^C in these different reservoirs. For example, atmospheric radiocarbon that diffuses into the surface oceans usually will reside for centuries before phytoplankton biologically fix it through photosynthesis, which will lead marine ^14^C to be depleted (and ‘too old’) relative to atmospheric ^14^C. Use the wrong calibration curve and your age estimate will be inaccurate!
 
-The IntCal series (IntCal04, IntCal09, IntCal13, IntCal20) is the community standard for calibrating radiocarbon dates to age estimates in calendar years in the northern hemisphere [e.g., @reimer2020]. The SHcal series is used for the southern hemisphere. The conversion from radiocarbon to calendar years usually further increases the uncertainty of age estimates.
+The IntCal series (IntCal04, IntCal09, IntCal13, IntCal20) is the community standard for calibrating radiocarbon dates to age estimates in calendar years in the northern hemisphere [e.g., @reimer2020]. The SHcal series is used for the southern hemisphere. The conversion from radiocarbon to calendar years usually further increases the uncertainty of age estimates. Here is an example of a single date:
 
 
 ```{r}
@@ -39,7 +39,7 @@ plot(includeCal = TRUE)
 ```
 
 
-# Calibrating radiocarbon dates in R 
+# Calibrating radiocarbon dates in R {#sec-cal-dates}
 
 Here we’ll experiment with calibrating radiocarbon dates, using various calibration curves. Radiocarbon dated samples come back from the lab with a radiocarbon age and standard deviation, among other information. These two bits of information are used to calibrate the radiocarbon dates to estimated ages. R packages may have useful vignettes (package tutorials) and built-in datasets that provide handy test templates. The following code is modified from the `Bchron` [vignette](https://cran.r-project.org/web/packages/Bchron/vignettes/Bchron.html).
 
@@ -83,6 +83,7 @@ The `BchronCalibrate()` example above uses three arguments: (i) uncalibrated age
 
 -  Experiment with calibrating a few different ages and standard deviations
     - try a few single ages and plot the calibration curve as shown in @sec-cal-curve
+    - also try a few dates at once as in @sec-cal-dates
 - check the function documentation for different calibration curves and try the southern hemisphere calibration.
 
 Give a :raised_hand: in zoom if you have questions and :white_check_mark: when you have managed to calibrate and inspect a few different dates.
@@ -184,6 +185,7 @@ Note that all the values provided to the arguments are contained in the Sluggan 
 ```{r Bayesian}
 #| output: false
 
+set.seed(1984)
 SlugganOut = with(Sluggan, 
                Bchronology(ages=ages,
                            ageSds=ageSds, 
@@ -230,6 +232,14 @@ The `Sluggan` data provide a great in-built working dataset for us to play with.
 Give a :raised_hand: in zoom if you have questions and :white_check_mark: when you have managed to calibrate and inspect a few different dates.
 
 Who has a figure they are willing to share?
+
+# Neotoma example
+
+So far we have used the built-in datasets for the sake of demonstration. But let's now follow a real example by pulling data from the neotoma database.
+
+The following code will download data from neotoma.....  I have also saved some example datasets in the data directory just in case the neotoma API is under maintainance or there are download speed issues.
+
+
 
 ::: {.callout-tip}
 # Resources
