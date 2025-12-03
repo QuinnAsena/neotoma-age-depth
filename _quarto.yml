@@ -1,9 +1,11 @@
 title: "Neotoma age-depth"
 author:
   - name: "Quinn Asena"
-    affiliation: " Cary Institute for ecosystem Sciences"
+    affiliation: "Cary Institute for ecosystem Sciences"
   - name: "Jack Williams"
     affiliation: "University of Wisconsin-Madison"
+  - name: "Simon Goring"
+    affiliation: "University of Wisconsin-Madison"    
 date: today
 format:
   html:
@@ -13,6 +15,7 @@ format:
     
 bibliography: refs.bib
 from: markdown+emoji
+embed-resources: true
 
 execute: 
   cache: true

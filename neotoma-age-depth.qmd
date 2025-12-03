@@ -18,7 +18,7 @@ We will be using `Bchron` for calibration and Bayesian age-depth modelling. Nota
 #| output: false
 # Load up the package
 if (!require("pacman")) install.packages("pacman", repos="http://cran.r-project.org")
-pacman::p_load(neotoma2, Bchron, splines) # splines comes with BASE-R
+pacman::p_load(neotoma2, Bchron, splines, ggplot2, dplyr) # splines comes with BASE-R
 ```
 :::
 
@@ -174,7 +174,7 @@ One of the issues with classical age-depth modelling is that uncertainty _decrea
 
 # Bayesian age-depth models
 
-Now let's see what the latest methods show for the same dataset.
+Now let's see what the latest methods show for the same dataset. The Sluggan dataset has a lot of radiocarbon dates! We are going to experiment by reducing the number and placement of radiocarbon samples through the core and seeing the affect on the model prediction and uncertainty.
 
 :::  {.panel-tabset}
 
@@ -185,7 +185,7 @@ Note that all the values provided to the arguments are contained in the Sluggan 
 ```{r Bayesian}
 #| output: false
 
-set.seed(1984)
+set.seed(1984) # The models are stochastic, good idea to set the seed for reproducibility
 SlugganOut = with(Sluggan, 
                Bchronology(ages=ages,
                            ageSds=ageSds, 
@@ -193,7 +193,10 @@ SlugganOut = with(Sluggan,
                            positions=position, 
                            positionThicknesses=thickness,
                            ids=id, 
-                           predictPositions=seq(0,518, by=10)))
+                           predictPositions=c(
+                             seq(min(Sluggan$position), max(Sluggan$position), by=10),
+                             518))
+               )
 
 ```
 
@@ -203,6 +206,16 @@ The summary shows for each position (depth) the median and quartiles of the pred
 
 ```{r BayesianSummary}
 summary(SlugganOut)
+
+```
+
+
+## Outliers
+
+The summary shows possible outliers per date.
+
+```{r BayesianOutliers}
+summary(SlugganOut, type = "outliers")
 
 ```
 
@@ -221,6 +234,7 @@ Commonly, only the median age is reported; however, it is good practice to repor
 
 :::
 
+
 ## Your turn
 
 The `Sluggan` data provide a great in-built working dataset for us to play with. Take 5 minutes to:
@@ -233,18 +247,126 @@ Give a :raised_hand: in zoom if you have questions and :white_check_mark: when y
 
 Who has a figure they are willing to share?
 
+Let's discuss how the output changes depending on the placement and number of chronological controls
+
+
+- Now edit the `predictPositions` argument. This argument expects a depth sequence. Currently it is set as a sequence for every 10 cm (plus the core bottom at 518 cm). Try different depth resolutions (careful of the run time, if you go for a 1 cm sequence then it will take a while to run!).
+
+
+## Accumulation rate
+
+Now that we have an age-depth model, we can also obtain the accumulation rates:
+
+```{r}
+#| output: false
+acc_rate <- summary(SlugganOut,
+  type = "acc_rate",
+  probs = c(0.25, 0.5, 0.75)
+)
+
+```
+
+And visualise them:
+
+```{r}
+ggplot2::ggplot(acc_rate, aes(
+  x = age_grid, y = `50%`,
+  ymax = `75%`, ymin = `25%`)) +
+  geom_line() +
+  geom_ribbon(alpha = 0.2) +
+  theme_bw() +
+  scale_x_reverse() +
+  labs(
+    y = "cm per year",
+    x = "Age (cal years BP)"
+  )
+
+```
+
+
 # Neotoma example
 
-So far we have used the built-in datasets for the sake of demonstration. But let's now follow a real example by pulling data from the neotoma database.
+So far we have used the built-in dataset from the northern hemisphere for the sake of demonstration. But let's now follow an example by pulling data from the neotoma database. Although this is not a `neotoma2` tutorial, we can cover rebuilding a chronology if we still have time.
 
-The following code will download data from neotoma.....  I have also saved some example datasets in the data directory just in case the neotoma API is under maintainance or there are download speed issues.
+The following code will download data from the neotoma database. I have also saved some example datasets in the data directory just in case the neotoma API is under maintenance or there are download speed issues. If you have your own data or would like to download a site of your choice from neotoma feel free to do that. [neotoma explorer](https://apps.neotomadb.org/explorer/index.html) can help you find a site id.
 
 
+site IDs:
+
+- Laguna Padre Laguna <- 10063 (Argentina)
+- Mallin Book <- 1639 (Argentina)
+- Harberton <- 10136 ()
+- Lago Puerto Arturo <- 28348 (Guatemala)
+- Albatross Lake <- 28408 (Marion Island)
+- Lake Edward <- 26660
+- Lake Victoria II <- 31747 (Uganda linear interpolation)
+- Lake Kirkpatrick <- 9865
+- Lake Frome <- 28489 (Auestrailia)
+
+
+
+
+```{r}
+if (!file.exists(file.path("./data/some_sites.rds"))) {
+  site_ids <- c(10063, 1639, 10136, 28408, 9865, 28489, 31732)
+  some_sites <- neotoma2::get_sites(site_ids)
+  neotoma2::plotLeaflet(some_sites)
+  saveRDS(some_sites, "./data/some_sites.rds")
+} else {
+  some_sites <- readRDS("./data/some_sites.rds")
+}
+```
+
+
+
+
+```{r}
+if (!file.exists(file.path("./data/some_datasets.rds"))) {
+
+  some_datasets <- 
+    neotoma2::get_datasets(some_sites, all_data = TRUE) |>
+    neotoma2::filter(datasettype == "pollen" & !is.na(age_range_young)) |>
+    neotoma2::get_downloads()
+  
+  saveRDS(some_datasets, "./data/some_datasets.rds")
+} else {
+  some_datasets <- readRDS("./data/some_datasets.rds")
+}
+```
+
+```{r}
+controls <- neotoma2::chroncontrols(some_datasets[[1]]) |>
+  dplyr::filter(chronologyid == 33123) |> # If there is more than on chronology
+  dplyr::arrange(depth)
+```
+
+
+```{r}
+#| output: false
+newChron <- Bchron::Bchronology(
+  ages = controls$chroncontrolage,
+  ageSds = abs(controls$agelimityounger - 
+               controls$chroncontrolage),
+  calCurves = c("normal", rep("intcal20", 9)),
+  positions = controls$depth,
+  positionThicknesses = controls$thickness,
+  ids = controls$chroncontrolid,
+  predictPositions=
+      seq(min(controls$depth), max(controls$depth), by=10))
+
+
+```
+
+```{r}
+plot(newChron)
+```
 
 ::: {.callout-tip}
 # Resources
 
 Age-depth modelling is complicated, there are many pitfalls, assumptions, and uncertainties that are often ignored. Recent developments have begun to focus on quantifying uncertainties to understand the reliability of inferences made from the data. Key papers for understanding age depth modelling include:
+
+- The Bchron [vignette](https://cran.r-project.org/web/packages/Bchron/vignettes/Bchron.html) is also a useful resource. 
 
 - @blaauw2018
 
@@ -252,7 +374,6 @@ Age-depth modelling is complicated, there are many pitfalls, assumptions, and un
 
 - @trachsel2017
 
-The Bchron [vignette](https://cran.r-project.org/web/packages/Bchron/vignettes/Bchron.html) is also a useful resource. 
 
 :::
 

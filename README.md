@@ -17,5 +17,5 @@ Install the required packages:
 
 ```
 if (!require("pacman")) install.packages("pacman", repos="http://cran.r-project.org")
-pacman::p_load(neotoma2, Bchron, splines)
+pacman::p_load(neotoma2, Bchron, splines, ggplot2, dplyr)
 ```
