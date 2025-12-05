@@ -2,7 +2,7 @@
 
 For the last 50,000 years, radiocarbon (^14^C), with its half-life of 5,730 years, is by far the most common form of radiometric dating. (Beyond 10 half-lives, so much of a radioactive substance has decayed away that it becomes immeasurable.) Radiocarbon is the mainstay of Quaternary dating and archaeology.
 
-In Quaternary paleoecology, radiocarbon dating is expensive – a single sample typically costs $300 to $500 – so usually a given lake-sediment record will have only a scattering (ca. 5 to 30) of radiocarbon dates and other age controls. Other kinds of age controls include volcanic ash layers (tephras), ^210^Pb (half-life: 22.6 yrs), optically stimulated luminescence (OSL) dates, historic events such as the rise in *Ambrosia* pollen abundances associated with EuroAmerican land clearance, etc. An age-depth model must be constructed to estimate the age of sediments not directly associated with an age control. In multi-site data syntheses, the number of age controls, their precision, and their likely accuracy are all fundamental indicators of data quality [e.g. @blois2011; @mottl2021].
+In Quaternary paleoecology, radiocarbon dating is expensive – a single sample typically costs $300 to $500 – so usually a given lake-sediment record will have only a scattering (ca. 5 to 30) of radiocarbon dates and other age controls. Other kinds of age controls include volcanic ash layers (tephras), ^210^Pb (half-life: 22.6 yrs), optically stimulated luminescence (OSL) dates, historic events such as the rise in *Ambrosia* pollen abundances associated with EuroAmerican land clearance, etc., an age-depth model must be constructed to estimate the age of sediments not directly associated with an age control. In multi-site data syntheses, the number of age controls, their precision, and their likely accuracy are all fundamental indicators of data quality [e.g. @blois2011; @mottl2021].
 
 To estimate ages for depths lacking radiocarbon date, an age-depth model is required. Age-depth models are fitted to the available age controls (age estimates with uncertainty for individual depths) and provide estimates of age as a function of depth, for all depths and ages within the temporal bounds of the model.
 
@@ -27,13 +27,13 @@ pacman::p_load(neotoma2, Bchron, splines, ggplot2, dplyr) # splines comes with B
 
 A complication in radiocarbon dating is that the initial calculation of a radiocarbon age assumes, by convention, that the amount of radiocarbon in the atmosphere is constant over time. See @ramsey2008 for a good overview of ^14^C dating. This assumption is untrue, so all radiocarbon age estimates must be post-hoc calibrated using a calibration curve that is based on compiling radiocarbon dates of materials that have precise independent age estimates (e.g. tree rings, corals). Yet another complication in radiocarbon dating is that different calibration curves need to be used for the Northern vs. Southern Hemisphere and for the atmosphere vs. oceans, due to different residence times of ^14^C in these different reservoirs. For example, atmospheric radiocarbon that diffuses into the surface oceans usually will reside for centuries before phytoplankton biologically fix it through photosynthesis, which will lead marine ^14^C to be depleted (and ‘too old’) relative to atmospheric ^14^C. Use the wrong calibration curve and your age estimate will be inaccurate!
 
-The IntCal series (IntCal04, IntCal09, IntCal13, IntCal20) is the community standard for calibrating radiocarbon dates to age estimates in calendar years in the northern hemisphere [e.g., @reimer2020]. The SHcal series is used for the southern hemisphere. The conversion from radiocarbon to calendar years usually further increases the uncertainty of age estimates. Here is an example of a single date:
+The IntCal series (IntCal04, IntCal09, IntCal13, IntCal20) is the community standard for calibrating radiocarbon dates to age estimates in calendar years in the northern hemisphere [@reimer2020]. The SHcal series is used for the southern hemisphere [@hogg2020]. The conversion from radiocarbon to calendar years usually further increases the uncertainty of age estimates. Here is an example of a single date:
 
 
 ```{r}
-BchronCalibrate(ages=c(11553), 
-                ageSds=c(50), 
-                calCurves=c('intcal20')) |>
+BchronCalibrate(ages = 11553, 
+                ageSds = 50, 
+                calCurves = 'intcal20') |>
 plot(includeCal = TRUE)
 
 ```
@@ -49,9 +49,9 @@ Here we’ll experiment with calibrating radiocarbon dates, using various calibr
 
 ```{r BchronCalibrate}
 #| output: false
-ages = BchronCalibrate(ages=c(3445,11553,7456), 
-                        ageSds=c(50,230,110), 
-                        calCurves=c('intcal20','intcal20','intcal20'))
+ages <- BchronCalibrate(ages = c(3445, 11553, 7456), 
+                        ageSds = c(50, 230, 110), 
+                        calCurves = c('intcal20','intcal20','intcal20'))
 ```
 
 ## Summary
@@ -87,7 +87,7 @@ The output summary indicates the range of the highest density regions (i.e., the
 
 ## Your turn
 
-The `BchronCalibrate()` example above uses three arguments: (i) uncalibrated ages (the estimated date returned from the lab); (ii) a standard deviation associated with each of the ages; (iii) a calibration curve associated with each of the dates. Take 5 minutes to:
+The `BchronCalibrate()` example above uses three inputs: (i) uncalibrated ages (the estimated date returned from the lab); (ii) a standard deviation associated with each of the ages; (iii) a calibration curve associated with each of the dates. Take 5 minutes to:
 
 -  Experiment with calibrating a few different ages and standard deviations
     - try a few single ages and plot the calibration curve as shown in @sec-cal-curve
